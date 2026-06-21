@@ -1,0 +1,177 @@
+:root {
+  --bg: #fafaf9;
+  --bg-elevated: #ffffff;
+  --border: #e7e5e4;
+  --border-strong: #d6d3d1;
+  --fg: #1c1917;
+  --fg-muted: #57534e;
+  --fg-faint: #a8a29e;
+  --accent: #1c1917;
+  --accent-fg: #fafaf9;
+  --danger: #b91c1c;
+  --ok: #15803d;
+  --warn: #b45309;
+
+  /* Strong custom easings — built-ins are too weak (Emil) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow:    0 4px 16px -8px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c0a09;
+    --bg-elevated: #1c1917;
+    --border: #292524;
+    --border-strong: #44403c;
+    --fg: #fafaf9;
+    --fg-muted: #a8a29e;
+    --fg-faint: #57534e;
+    --accent: #fafaf9;
+    --accent-fg: #0c0a09;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Inter", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: inherit; text-decoration: none; }
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+::selection { background: color-mix(in oklab, var(--accent) 25%, transparent); }
+
+/* Page-entry: gentle fade, no movement. Sub-300ms. */
+.page-enter {
+  opacity: 1;
+  transition: opacity 220ms var(--ease-out);
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+/* Button feel — Emil: scale(0.97) on :active gives instant feedback */
+.ui-btn:active { transform: scale(0.97); }
+.ui-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px color-mix(in oklab, var(--accent) 50%, transparent);
+}
+.ui-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+/* Gate hover behind real pointers (touch devices fake hover on tap) */
+@media (hover: hover) and (pointer: fine) {
+  .ui-btn:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--accent) 4%, var(--bg-elevated));
+  }
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent) !important;
+}
+
+/* ── Responsive layout utilities ──────────────────────────────────────────
+   Mobile-first: stack everything. Above 720px, switch to the two-pane /
+   four-column desktop layouts. Tap targets stay >= 36px throughout. */
+
+.row-form-4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 560px) {
+  .row-form-4 { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 860px) {
+  .row-form-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+}
+
+.row-calendar {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 760px) {
+  .row-calendar {
+    grid-template-columns: 340px 1fr;
+    gap: 28px;
+  }
+}
+
+.row-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+}
+@media (min-width: 560px) {
+  .row-card {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+}
+
+/* Page chrome — tighter on phones */
+.page-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+@media (min-width: 640px) {
+  .page-shell { padding: 32px 24px 80px; }
+}
+
+.page-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media (min-width: 560px) {
+  .page-head {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+}
+
+/* Better tap feel on touch — slightly larger targets */
+@media (hover: none) and (pointer: coarse) {
+  .ui-btn { min-height: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { transition-duration: 120ms; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 120ms !important;
+  }
+}
