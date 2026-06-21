@@ -5,7 +5,7 @@ import { SiteFooter } from '@/components/site-footer';
 export const metadata = {
   title: 'Railway Concession',
   description: 'Your home → Thane railway concession form, signed and ready in one visit.',
-  metadataBase: new URL('https://consession.vercel.app'),
+  metadataBase: new URL('https://concession.focuzdrvn.tech'),
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
