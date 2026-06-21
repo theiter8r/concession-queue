@@ -53,7 +53,7 @@ export async function GET(req: Request) {
     });
   }
   const buf = await toXlsx(rows, REPORT_COLUMNS);
-  return new NextResponse(buf, {
+  return new NextResponse(new Uint8Array(buf), {
     headers: {
       'content-type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'content-disposition': `attachment; filename="booklet-${booklet_no}.xlsx"`,

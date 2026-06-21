@@ -35,7 +35,7 @@ export async function GET(req: Request) {
 
   if (format === 'xlsx') {
     const buf = await toXlsx(data ?? [], cols);
-    return new NextResponse(buf, {
+    return new NextResponse(new Uint8Array(buf), {
       headers: {
         'content-type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'content-disposition': 'attachment; filename="export.xlsx"',
