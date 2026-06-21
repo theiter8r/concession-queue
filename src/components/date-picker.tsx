@@ -117,8 +117,8 @@ export function DatePicker({ value, onChange, min, max, disabled, placeholder = 
               const iso = toIso(date);
               const isSelected = value === iso;
               const isToday = sameDay(date, today);
-              const tooEarly = minDate && date < minDate;
-              const tooLate = maxDate && date > maxDate;
+              const tooEarly = !!minDate && date < minDate;
+              const tooLate = !!maxDate && date > maxDate;
               const dis = !inMonth || tooEarly || tooLate;
               return (
                 <button
