@@ -38,14 +38,27 @@ export async function POST(req: Request) {
   return NextResponse.json(data);
 }
 
-// GET /api/requests — my requests + statuses + due dates (§11).
+// GET /api/requests — my requests + statuses + due dates + active appointment (§11).
 export async function GET() {
   await requireUser();
   const sb = await supabaseServer();
   const { data, error } = await sb
     .from('concession_requests')
-    .select('*')
+    .select('*, appointments(id, status, slots(slot_start))')
     .order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json(data);
+
+  // Flatten to the single active appointment per request. The partial unique
+  // index `one_active_appt_per_request` already guarantees at most one.
+  const shaped = (data ?? []).map((r: any) => {
+    const active = (r.appointments ?? []).find((a: any) => a.status !== 'cancelled');
+    return {
+      ...r,
+      appointment: active
+        ? { id: active.id, status: active.status, slot_start: active.slots?.slot_start ?? null }
+        : null,
+      appointments: undefined,
+    };
+  });
+  return NextResponse.json(shaped);
 }

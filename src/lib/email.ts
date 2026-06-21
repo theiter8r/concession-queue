@@ -133,6 +133,48 @@ export async function sendAdminCancelEmail(args: {
   });
 }
 
+export async function sendSeasonTicketReminder(args: {
+  to: string;
+  name: string;
+  route: string;
+  meUrl: string;
+}) {
+  return deliver({
+    to: args.to,
+    subject: 'Add your season ticket number',
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Season Ticket Reminder</title></head>
+<body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 480px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        <tr><td style="padding: 32px 32px 0 32px;">
+          <div style="display: inline-block; background-color: #111827; color: #ffffff; font-size: 11px; font-weight: 600; letter-spacing: 1px; padding: 4px 10px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;">
+            REMINDER
+          </div>
+        </td></tr>
+        <tr><td style="padding: 24px 32px 8px 32px;">
+          <h1 style="margin: 0; font-size: 22px; font-weight: 600; color: #111827; letter-spacing: -0.02em;">Hi ${args.name},</h1>
+          <p style="margin: 12px 0 0 0; font-size: 15px; line-height: 1.5; color: #4b5563;">
+            We issued your concession form for <span style="font-weight:600;color:#111827;">${args.route}</span> yesterday.
+            Once you buy the pass at the railway counter, add your <b>season ticket number</b> so the college register has it on file.
+          </p>
+        </td></tr>
+        <tr><td style="padding: 24px 32px;" align="center">
+          <a href="${args.meUrl}" style="display:inline-block;background-color:#111827;color:#ffffff;text-decoration:none;font-weight:500;font-size:14px;padding:10px 18px;border-radius:8px;">Add season ticket number</a>
+        </td></tr>
+        <tr><td style="background-color:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px;" align="center">
+          <p style="margin:0;font-size:12px;color:#6b7280;">You'll only get this reminder once.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  });
+}
+
 export async function sendStudentCancelEmail(args: {
   to: string;
   name: string;

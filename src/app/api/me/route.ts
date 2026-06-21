@@ -23,9 +23,15 @@ export async function POST(req: Request) {
   }
 
   const b = await req.json();
-  const required = ['name', 'dob', 'gender', 'enrollment_no', 'home_station'] as const;
+  const required = ['name', 'dob', 'gender', 'enrollment_no', 'home_station',
+    'department', 'academic_year', 'division'] as const;
   for (const k of required) {
     if (!b[k]) return NextResponse.json({ error: `${k}_required` }, { status: 400 });
+  }
+
+  const ALLOWED_YEARS = ['FE', 'SE', 'TE', 'BE'] as const;
+  if (!ALLOWED_YEARS.includes(b.academic_year)) {
+    return NextResponse.json({ error: 'invalid_academic_year' }, { status: 400 });
   }
 
   // Upsert keyed on auth_id; college_email comes from the verified auth identity.
@@ -39,6 +45,9 @@ export async function POST(req: Request) {
     enrollment_no: b.enrollment_no,
     home_station: b.home_station,
     address: b.address ?? null,
+    department: b.department,
+    academic_year: b.academic_year,
+    division: b.division,
   };
 
   const { data: existing } = await sb.from('users').select('id, role').eq('auth_id', user.id).maybeSingle();

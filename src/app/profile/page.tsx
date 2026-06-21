@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Page, Card, Button, Input, Label } from '@/components/ui';
+import { Page, Card, Button, Input, Label, Select } from '@/components/ui';
 import { StationSelect } from '@/components/station-select';
 
 // /profile — quick edit for the fields that change between concession passes:
@@ -39,6 +39,9 @@ export default function ProfilePage() {
         enrollment_no: me.enrollment_no,
         home_station: me.home_station,
         address: me.address ?? '',
+        department: me.department ?? '',
+        academic_year: me.academic_year ?? '',
+        division: me.division ?? '',
       }),
     });
     setBusy(false);
@@ -81,6 +84,38 @@ export default function ProfilePage() {
               value={me.address ?? ''}
               onChange={(e) => setMe((m: any) => ({ ...m, address: e.target.value }))}
             />
+          </div>
+          <div>
+            <Label>Department</Label>
+            <Input
+              placeholder="e.g. Computer Engineering"
+              value={me.department ?? ''}
+              onChange={(e) => setMe((m: any) => ({ ...m, department: e.target.value }))}
+            />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <Label>Year</Label>
+              <Select
+                value={me.academic_year ?? ''}
+                onChange={(e) => setMe((m: any) => ({ ...m, academic_year: e.target.value }))}
+              >
+                <option value="">Select year</option>
+                <option value="FE">FE</option>
+                <option value="SE">SE</option>
+                <option value="TE">TE</option>
+                <option value="BE">BE</option>
+              </Select>
+            </div>
+            <div>
+              <Label>Division</Label>
+              <Input
+                placeholder="e.g. A"
+                maxLength={4}
+                value={me.division ?? ''}
+                onChange={(e) => setMe((m: any) => ({ ...m, division: e.target.value.toUpperCase() }))}
+              />
+            </div>
           </div>
 
           {err && (

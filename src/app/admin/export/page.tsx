@@ -7,8 +7,9 @@ import { DatePicker } from '@/components/date-picker';
 
 const ALL_COLUMNS = [
   'name','enrollment_no','college_email','phone','dob','gender','address','home_station',
+  'department','academic_year','division',
   'station_from','station_to','travel_class','period','reason','status','due_date','created_at',
-  'booklet_no','railway_form_no','issued_at',
+  'booklet_no','railway_form_no','issued_at','season_ticket_no',
 ];
 
 export default function ExportPage() {

@@ -16,9 +16,12 @@ type Form = {
   enrollment_no: string;
   home_station: string;
   address: string;
+  department: string;
+  academic_year: 'FE' | 'SE' | 'TE' | 'BE' | '';
+  division: string;
 };
 
-const TOTAL = 5;
+const TOTAL = 6;
 
 export default function SignupPage() {
   const [step, setStep] = useState(0);
@@ -28,6 +31,7 @@ export default function SignupPage() {
   const [me, setMe] = useState<Form>({
     name: '', dob: '', gender: 'female',
     phone: '', enrollment_no: '', home_station: '', address: '',
+    department: '', academic_year: '', division: '',
   });
 
   useEffect(() => {
@@ -89,8 +93,9 @@ export default function SignupPage() {
               {step === 0 && <StepName me={me} setMe={setMe} />}
               {step === 1 && <StepBasics me={me} setMe={setMe} />}
               {step === 2 && <StepStudent me={me} setMe={setMe} />}
-              {step === 3 && <StepStation me={me} setMe={setMe} />}
-              {step === 4 && <StepReview me={me} setMe={setMe} />}
+              {step === 3 && <StepAcademic me={me} setMe={setMe} />}
+              {step === 4 && <StepStation me={me} setMe={setMe} />}
+              {step === 5 && <StepReview me={me} setMe={setMe} />}
             </div>
 
             {err && (
@@ -156,8 +161,9 @@ function canAdvance(step: number, me: Form): boolean {
     case 0: return me.name.trim().length > 1;
     case 1: return !!me.dob && !!me.gender;
     case 2: return me.enrollment_no.trim().length > 0;
-    case 3: return me.home_station.trim().length > 0;
-    case 4: return me.address.trim().length > 0;
+    case 3: return me.department.trim().length > 0 && !!me.academic_year && me.division.trim().length > 0;
+    case 4: return me.home_station.trim().length > 0;
+    case 5: return me.address.trim().length > 0;
     default: return false;
   }
 }
@@ -244,6 +250,47 @@ function StepStudent({ me, setMe }: { me: Form; setMe: (f: (m: Form) => Form) =>
   );
 }
 
+function StepAcademic({ me, setMe }: { me: Form; setMe: (f: (m: Form) => Form) => void }) {
+  return (
+    <>
+      <StepHeader title="Academic details" hint="Printed on the concession form — department, year and division." />
+      <div>
+        <Label>Department</Label>
+        <Input
+          required
+          autoFocus
+          value={me.department}
+          onChange={(e) => setMe(m => ({ ...m, department: e.target.value }))}
+          placeholder="e.g. Computer Engineering"
+        />
+      </div>
+      <div>
+        <Label>Year</Label>
+        <Select
+          value={me.academic_year}
+          onChange={(e) => setMe(m => ({ ...m, academic_year: e.target.value as Form['academic_year'] }))}
+        >
+          <option value="">Select year</option>
+          <option value="FE">FE</option>
+          <option value="SE">SE</option>
+          <option value="TE">TE</option>
+          <option value="BE">BE</option>
+        </Select>
+      </div>
+      <div>
+        <Label>Division</Label>
+        <Input
+          required
+          value={me.division}
+          onChange={(e) => setMe(m => ({ ...m, division: e.target.value.toUpperCase() }))}
+          placeholder="e.g. A"
+          maxLength={4}
+        />
+      </div>
+    </>
+  );
+}
+
 function StepStation({ me, setMe }: { me: Form; setMe: (f: (m: Form) => Form) => void }) {
   return (
     <>
@@ -290,6 +337,8 @@ function StepReview({ me, setMe }: { me: Form; setMe: (f: (m: Form) => Form) => 
         <Row k="Gender" v={me.gender} />
         <Row k="Enrollment" v={me.enrollment_no} />
         {me.phone && <Row k="Phone" v={me.phone} />}
+        <Row k="Department" v={me.department} />
+        <Row k="Year · Division" v={`${me.academic_year} · ${me.division}`} />
         <Row k="Home station" v={me.home_station} />
       </div>
     </>

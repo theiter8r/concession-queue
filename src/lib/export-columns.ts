@@ -10,6 +10,9 @@ export const COLUMN_WHITELIST = {
   gender:          (r: any) => r.users?.gender,
   address:         (r: any) => r.users?.address,
   home_station:    (r: any) => r.users?.home_station,
+  department:      (r: any) => r.users?.department,
+  academic_year:   (r: any) => r.users?.academic_year,
+  division:        (r: any) => r.users?.division,
   station_from:    (r: any) => r.station_from,
   station_to:      (r: any) => r.station_to,
   travel_class:    (r: any) => r.travel_class,
@@ -21,6 +24,7 @@ export const COLUMN_WHITELIST = {
   booklet_no:      (r: any) => r.concession_forms?.[0]?.booklet_no,
   railway_form_no: (r: any) => r.concession_forms?.[0]?.railway_form_no,
   issued_at:       (r: any) => r.concession_forms?.[0]?.issued_at,
+  season_ticket_no:(r: any) => r.season_ticket_no,
 } as const;
 
 export type AllowedColumn = keyof typeof COLUMN_WHITELIST;

@@ -16,12 +16,15 @@ export async function POST(req: Request) {
 
   // Ownership: the request must belong to the calling student. RLS would block
   // the RPC's underlying update anyway, but a clean 404 is friendlier.
-  const { data: r } = await sb
+  const { data: r, error: rErr } = await sb
     .from('concession_requests')
     .select('id, user_id, station_from')
     .eq('id', request_id)
-    .single();
-  if (!r || r.user_id !== me.id) {
+    .maybeSingle();
+  if (rErr || !r || r.user_id !== me.id) {
+    console.error('[appointments] ownership check failed', {
+      me_id: me.id, request_id, found: !!r, row_user_id: r?.user_id, rErr: rErr?.message,
+    });
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
 

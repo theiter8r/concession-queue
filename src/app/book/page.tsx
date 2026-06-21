@@ -18,12 +18,23 @@ export default function BookPage() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [picking, setPicking] = useState<string | null>(null);
+  const [pendingSlot, setPendingSlot] = useState<Slot | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [stPrompt, setStPrompt] = useState<{ request_id: string; route: string } | null>(null);
+  const [stNo, setStNo] = useState('');
+  const [stBusy, setStBusy] = useState(false);
+  const [stDismissed, setStDismissed] = useState(false);
 
   useEffect(() => {
     fetch('/api/slots').then(r => r.json()).then((data) => {
       if (Array.isArray(data)) setSlots(data);
+    });
+
+    // Surface the season-ticket capture prompt only when the server says so —
+    // once per month, only if a prior issued request is still missing the no.
+    fetch('/api/season-ticket/prompt').then(r => r.json()).then((p) => {
+      if (p?.request_id) setStPrompt({ request_id: p.request_id, route: p.route });
     });
 
     const params = new URLSearchParams(window.location.search);
@@ -85,25 +96,32 @@ export default function BookPage() {
     return r.id;
   }
 
-  async function pick(slot: Slot) {
+  function pick(slot: Slot) {
     setErr(null);
     if (!requestDraft.station_from.trim()) {
       setErr('Set your home station in your profile first.');
       return;
     }
-    setPicking(slot.id);
+    setPendingSlot(slot);
+  }
+
+  async function confirmBooking() {
+    if (!pendingSlot) return;
+    setErr(null);
+    setPicking(pendingSlot.id);
     const rid = await createDraft();
     if (!rid) { setPicking(null); return; }
     const res = await fetch('/api/appointments', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ slot_id: slot.id, request_id: rid }),
+      body: JSON.stringify({ slot_id: pendingSlot.id, request_id: rid }),
     });
     if (res.status === 409) {
       setErr('That slot just filled up — pick another.');
       const fresh = await fetch('/api/slots').then(r => r.json());
       setSlots(fresh);
       setPicking(null);
+      setPendingSlot(null);
       return;
     }
     if (!res.ok) {
@@ -131,11 +149,47 @@ export default function BookPage() {
     );
   }
 
+  async function saveSeasonTicket() {
+    if (!stPrompt || !stNo.trim()) return;
+    setStBusy(true);
+    const res = await fetch(`/api/requests/${stPrompt.request_id}/season-ticket`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ season_ticket_no: stNo.trim() }),
+    });
+    setStBusy(false);
+    if (res.ok) setStPrompt(null);
+  }
+
   return (
     <Page
       title="Book an appointment"
       subtitle="Route is home → Thane. Pick a date, then a time."
     >
+      {stPrompt && !stDismissed && (
+        <Card style={{ padding: 18, marginBottom: 12, borderColor: 'color-mix(in oklab, var(--accent) 30%, var(--border))' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+            Quick — got your season ticket number yet?
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--fg-muted)', marginBottom: 12 }}>
+            You picked up a form for <strong>{stPrompt.route}</strong>. Add the number
+            the railway gave you so the college register has it.
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <Input
+              value={stNo}
+              onChange={(e) => setStNo(e.target.value)}
+              placeholder="e.g. WR/MTH/4421"
+              style={{ flex: '1 1 200px' }}
+            />
+            <Button variant="primary" onClick={saveSeasonTicket} disabled={stBusy || !stNo.trim()}>
+              {stBusy ? 'Saving…' : 'Save'}
+            </Button>
+            <Button variant="ghost" onClick={() => setStDismissed(true)}>I&apos;ll add it later</Button>
+          </div>
+        </Card>
+      )}
+
       <Card style={{ padding: 20, marginBottom: 16 }}>
         <div className="row-form-4">
           <div>
@@ -189,8 +243,42 @@ export default function BookPage() {
                 ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
                 : 'Select a date'}
             </div>
-            {selectedDate && (
-              <SlotList slots={slotsForDay} onPick={pick} picking={picking} />
+            {pendingSlot ? (
+              <div style={{
+                border: '1px solid color-mix(in oklab, var(--accent) 30%, var(--border))',
+                borderRadius: 'var(--radius-md)',
+                padding: 16,
+                background: 'color-mix(in oklab, var(--accent) 5%, var(--bg-elevated))',
+              }}>
+                <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--fg-faint)', marginBottom: 8 }}>
+                  Confirm appointment
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>
+                  {new Date(pendingSlot.slot_start).toLocaleString('en-IN', {
+                    weekday: 'long', day: '2-digit', month: 'long',
+                    hour: 'numeric', minute: '2-digit', hour12: true,
+                  })}
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--fg-muted)', marginBottom: 14 }}>
+                  {requestDraft.station_from} → Thane · {cap(requestDraft.travel_class)} class · {cap(requestDraft.period)}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--fg-muted)', marginBottom: 14, lineHeight: 1.5 }}>
+                  We&apos;ll email you a check-in OTP. Bring your college ID and show the OTP at the counter.
+                  You can cancel this from <strong>My requests</strong> up until the slot.
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <Button variant="primary" onClick={confirmBooking} disabled={!!picking}>
+                    {picking ? 'Booking…' : 'Confirm booking'}
+                  </Button>
+                  <Button variant="ghost" onClick={() => setPendingSlot(null)} disabled={!!picking}>
+                    Back
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              selectedDate && (
+                <SlotList slots={slotsForDay} onPick={pick} picking={picking} />
+              )
             )}
             {err && (
               <div style={{
@@ -207,6 +295,8 @@ export default function BookPage() {
     </Page>
   );
 }
+
+function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 function dayKey(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
