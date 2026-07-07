@@ -175,3 +175,156 @@ input:focus, select:focus, textarea:focus {
     transition-duration: 120ms !important;
   }
 }
+
+/* ── Top bar (auth-aware header) ─────────────────────────────────────────── */
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+@media (min-width: 768px) {
+  .app-topbar {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 12px 24px;
+  }
+}
+.app-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.app-dot {
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+.app-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.app-name-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  min-width: 0;
+}
+.app-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-size: 11px; font-weight: 600;
+  flex-shrink: 0;
+}
+.app-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-signout {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
+  color: var(--fg-faint);
+  cursor: pointer;
+  text-decoration: underline;
+  flex-shrink: 0;
+}
+.app-signout:hover {
+  color: var(--fg-muted);
+}
+
+/* ── Floating navigation ───────────────────────────────────────────────────
+   Bottom bar on mobile (<= 639px), floating left sidebar on desktop (>= 640px). */
+.mobile-nav {
+  position: fixed;
+  z-index: 100;
+  display: flex;
+  background: var(--bg-elevated);
+  gap: 2px;
+  transition: box-shadow 160ms var(--ease-out);
+
+  /* Mobile: bottom tab bar */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--border);
+  padding: 6px 8px;
+  padding-bottom: max(6px, env(safe-area-inset-bottom));
+  justify-content: space-around;
+  flex-direction: row;
+}
+@media (min-width: 640px) {
+  .mobile-nav {
+    /* Desktop: floating left sidebar */
+    top: 50%;
+    left: 20px;
+    right: auto;
+    bottom: auto;
+    transform: translateY(-50%);
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 8px 6px;
+    gap: 2px;
+    width: auto;
+  }
+}
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-muted);
+  text-decoration: none;
+  transition: color 160ms var(--ease-out), background 160ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+.mobile-nav-item.active {
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 6%, transparent);
+}
+@media (min-width: 640px) {
+  .mobile-nav-item {
+    flex-direction: row;
+    padding: 10px 14px;
+    font-size: 13px;
+    border-radius: var(--radius-sm);
+    position: relative;
+  }
+  .mobile-nav-item.active {
+    background: color-mix(in oklab, var(--accent) 6%, transparent);
+  }
+}
+
+/* Push content so fixed nav doesn't overlap */
+@media (max-width: 639px) {
+  .page-shell {
+    padding-bottom: calc(64px + 60px);
+  }
+}

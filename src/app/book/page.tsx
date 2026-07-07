@@ -141,7 +141,7 @@ export default function BookPage() {
             Bring your college ID. Show the OTP at the counter.
           </p>
           <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
-            <a href="/me"><Button variant="primary">View my appointment</Button></a>
+            <a href="/profile"><Button variant="primary">View my profile</Button></a>
             <a href="/slots"><Button>Live slots</Button></a>
           </div>
         </Card>
@@ -308,6 +308,7 @@ function prettyError(code?: string): string | null {
     missing_fields: 'Enter your home station, class, and period.',
     age_cutoff_exceeded: 'You exceed the age cap for this concession.',
     policy_not_allowed: 'That class/period combination isn\'t offered.',
+    weekly_limit_reached: 'You can book at most 2 slots per week.',
     slot_full: 'That slot just filled up — pick another.',
     slot_not_found: 'That slot is no longer available.',
     one_active_per_request: 'You already have an active appointment for this request.',

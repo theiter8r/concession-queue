@@ -33,7 +33,7 @@ export default function LoginPage() {
     setBusy(false);
     if (error) { setErr(error.message); return; }
     setStage('done');
-    window.location.href = '/me';
+    window.location.href = '/';
   }
 
   return (

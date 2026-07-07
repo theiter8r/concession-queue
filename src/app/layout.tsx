@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Viewport } from 'next';
 import { SiteFooter } from '@/components/site-footer';
+import { MobileNav } from '@/components/mobile-nav';
 
 export const metadata = {
   title: 'Railway Concession',
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <div className="page-enter">{children}</div>
+        <MobileNav />
         <SiteFooter />
       </body>
     </html>

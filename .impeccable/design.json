@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-07T21:50:00.000Z",
+  "title": "Design System: Railway Concession",
+  "extensions": {
+    "colorMeta": {
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Bone",
+        "canonical": "oklch(0.97 0.005 80)",
+        "tonalRamp": ["oklch(0.18 0.01 70)", "oklch(0.32 0.01 70)", "oklch(0.46 0.01 70)", "oklch(0.60 0.01 70)", "oklch(0.74 0.01 70)", "oklch(0.83 0.008 70)", "oklch(0.92 0.005 70)", "oklch(0.97 0.005 80)"]
+      },
+      "neutral-bg-elevated": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": ["oklch(0.18 0.01 70)", "oklch(0.32 0.01 70)", "oklch(0.46 0.01 70)", "oklch(0.60 0.01 70)", "oklch(0.74 0.01 70)", "oklch(0.83 0.008 70)", "oklch(0.95 0.003 70)", "oklch(1 0 0)"]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Ink",
+        "canonical": "oklch(0.21 0.02 70)",
+        "tonalRamp": ["oklch(0.10 0.01 70)", "oklch(0.15 0.015 70)", "oklch(0.21 0.02 70)", "oklch(0.32 0.018 70)", "oklch(0.46 0.015 70)", "oklch(0.60 0.01 70)", "oklch(0.74 0.008 70)", "oklch(0.88 0.005 70)"]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Pumice",
+        "canonical": "oklch(0.42 0.015 70)",
+        "tonalRamp": ["oklch(0.15 0.01 70)", "oklch(0.28 0.012 70)", "oklch(0.42 0.015 70)", "oklch(0.55 0.012 70)", "oklch(0.65 0.01 70)", "oklch(0.75 0.008 70)", "oklch(0.85 0.005 70)", "oklch(0.95 0.003 70)"]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Ash",
+        "canonical": "oklch(0.72 0.01 70)",
+        "tonalRamp": []
+      },
+      "border-light": {
+        "role": "neutral",
+        "displayName": "Ledge",
+        "canonical": "oklch(0.92 0.005 70)",
+        "tonalRamp": []
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Ledge Strong",
+        "canonical": "oklch(0.87 0.008 70)",
+        "tonalRamp": []
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Danger",
+        "canonical": "oklch(0.45 0.15 30)",
+        "tonalRamp": ["oklch(0.20 0.12 30)", "oklch(0.32 0.14 30)", "oklch(0.45 0.15 30)", "oklch(0.55 0.12 30)", "oklch(0.68 0.10 30)", "oklch(0.78 0.08 30)", "oklch(0.88 0.05 30)", "oklch(0.95 0.02 30)"]
+      },
+      "ok": {
+        "role": "tertiary",
+        "displayName": "OK",
+        "canonical": "oklch(0.52 0.15 150)",
+        "tonalRamp": []
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Warn",
+        "canonical": "oklch(0.58 0.13 65)",
+        "tonalRamp": []
+      }
+    },
+    "typographyMeta": {
+      "body": {
+        "displayName": "Body",
+        "purpose": "All prose, descriptions, form labels."
+      }
+    },
+    "shadows": [
+      { "name": "shadow-sm", "value": "0 1px 2px rgba(0,0,0,0.04)", "purpose": "Default card and surface shadow. Barely visible — tonal layering does the real work." },
+      { "name": "shadow", "value": "0 4px 16px -8px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.04)", "purpose": "Dropdown menus, modals, floating elements." },
+      { "name": "hero", "value": "0 24px 60px -28px rgba(0,0,0,0.25), 0 4px 12px -6px rgba(0,0,0,0.08)", "purpose": "Landing page preview card only." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "Default easing for all exit and state transitions. Quieter than built-in ease-out." },
+      { "name": "ease-in-out", "value": "cubic-bezier(0.77, 0, 0.175, 1)", "purpose": "Symmetrical entrance/exit transitions." },
+      { "name": "ease-drawer", "value": "cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Panel/drawer reveals." },
+      { "name": "duration-button-press", "value": "140ms", "purpose": "Button active scale transition." },
+      { "name": "duration-hover", "value": "160ms", "purpose": "Hover and state transitions." },
+      { "name": "duration-page-enter", "value": "220ms", "purpose": "Page entry fade-in." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "560px" },
+      { "name": "md", "value": "640px" },
+      { "name": "tablet", "value": "720px" },
+      { "name": "desktop-sm", "value": "760px" },
+      { "name": "desktop", "value": "860px" },
+      { "name": "desktop-lg", "value": "880px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Filled ink background, white text. The single call-to-action on any screen.",
+      "html": "<button class=\"ds-btn-primary\">Get started →</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 6px; border: 1px solid var(--fg); background: var(--fg); color: var(--bg-elevated); font-weight: 500; cursor: pointer; transition: transform 140ms var(--ease-out), background-color 160ms var(--ease-out); will-change: transform; } .ds-btn-primary:active { transform: scale(0.97); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px color-mix(in oklab, var(--fg) 50%, transparent); } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; } @media (hover: hover) and (pointer: fine) { .ds-btn-primary:hover:not(:disabled) { background: color-mix(in oklab, var(--fg) 4%, var(--bg-elevated)); } }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Paper background, ink border, ink text. Default variant for non-primary actions.",
+      "html": "<button class=\"ds-btn-secondary\">Follow on X</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-elevated); color: var(--fg); font-weight: 500; cursor: pointer; transition: transform 140ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out); will-change: transform; } .ds-btn-secondary:active { transform: scale(0.97); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px color-mix(in oklab, var(--fg) 50%, transparent); } @media (hover: hover) and (pointer: fine) { .ds-btn-secondary:hover:not(:disabled) { background: color-mix(in oklab, var(--fg) 4%, var(--bg-elevated)); } }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Transparent background, no border. For inline secondary actions.",
+      "html": "<button class=\"ds-btn-ghost\">Sign in</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--fg); font-weight: 500; cursor: pointer; transition: transform 140ms var(--ease-out), background-color 160ms var(--ease-out); will-change: transform; } .ds-btn-ghost:active { transform: scale(0.97); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px color-mix(in oklab, var(--fg) 50%, transparent); } @media (hover: hover) and (pointer: fine) { .ds-btn-ghost:hover:not(:disabled) { background: color-mix(in oklab, var(--fg) 4%, var(--bg-elevated)); } }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Paper background, 1px Ledge border, 6px radius. Compact 36px height.",
+      "html": "<input class=\"ds-input\" placeholder=\"Enter your email\" />",
+      "css": ".ds-input { height: 36px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-elevated); outline: none; transition: border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out); width: 100%; font: inherit; color: inherit; } .ds-input:focus { border-color: var(--fg) !important; box-shadow: 0 0 0 3px color-mix(in oklab, var(--fg) 18%, transparent) !important; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Paper background, 14px radius, 1px Ledge border, minimal shadow.",
+      "html": "<div class=\"ds-card\"><h3 style=\"margin:0 0 8px;font-size:17px;font-weight:600\">Card Title</h3><p style=\"margin:0;color:var(--fg-muted);font-size:14px\">Card body content.</p></div>",
+      "css": ".ds-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge-neutral",
+      "description": "Full pill (999px radius), 22px height, 12px font. Neutral tone shown.",
+      "html": "<span class=\"ds-badge\">Pending</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); color: var(--fg-muted); font-size: 12px; font-weight: 500; } .ds-badge[data-tone=\"ok\"] { background: color-mix(in oklab, var(--ok) 12%, transparent); color: var(--ok); border-color: color-mix(in oklab, var(--ok) 30%, transparent); } .ds-badge[data-tone=\"warn\"] { background: color-mix(in oklab, var(--warn) 12%, transparent); color: var(--warn); border-color: color-mix(in oklab, var(--warn) 30%, transparent); } .ds-badge[data-tone=\"danger\"] { background: color-mix(in oklab, var(--danger) 12%, transparent); color: var(--danger); border-color: color-mix(in oklab, var(--danger) 30%, transparent); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Direct Line",
+    "overview": "Clean, fast, and candid — this is a desk that faces the student, not the institution. No corporate gloss, no decorative friction, no waiting for things that don't matter. Every screen has one job, every interaction gives tactile feedback, and the page gets out of the way the moment the user knows what to do.\n\nThis system explicitly rejects generic SaaS visual language: no gradient text, no glassmorphism, no hero-metric templates, no thick colored side stripes, no repeating decorative backgrounds. The palette is deliberately tight — a monochromatic stone scale with three semantic signal colors. The accent IS the foreground.",
+    "keyCharacteristics": [
+      "Monochromatic, high-contrast palette — no brand color as accent",
+      "Flat-ish surfaces with tonal elevation, not shadow depth",
+      "Tactile micro-interactions (button press, focus rings)",
+      "Mobile-first, content-first layouts",
+      "No CSS framework — every primitive hand-rolled and intentional"
+    ],
+    "rules": [
+      { "name": "The One-Accent Rule", "body": "The accent is the foreground color. It does not appear as a separate brand hue.", "section": "colors" },
+      { "name": "The System Font Rule", "body": "No custom typeface is loaded. The system UI stack is fast, native-feeling.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Most surfaces have no shadow. Depth is conveyed by background color change.", "section": "elevation" }
+    ],
+    "dos": [
+      "Use ink (--fg) as the only emphasis color. Let weight, size, and position do the work.",
+      "Use color-mix(in oklab, ... alpha) for all tinted variants.",
+      "Keep buttons compact (36px default height).",
+      "Use tonal elevation instead of shadows for surface hierarchy.",
+      "Gate hover effects behind @media (hover: hover) and (pointer: fine).",
+      "Honor prefers-reduced-motion with shorter durations and disabled parallax."
+    ],
+    "donts": [
+      "Use gradient text (background-clip: text + gradient).",
+      "Add a separate brand accent color.",
+      "Use glassmorphism.",
+      "Use hero-metric layouts.",
+      "Use repeated card grids with identical icon + heading + body structure.",
+      "Use the small uppercase tracked 'eyebrow' above every section.",
+      "Use numbered section markers (01 / 02 / 03) unless the steps are an actual sequence.",
+      "Add decorative SVG illustrations, especially sketchy or hand-drawn ones.",
+      "Use repeating-linear-gradient stripe backgrounds or two-axis CSS grid overlays.",
+      "Pair border: 1px solid with box-shadow blur ≥ 16px on the same element.",
+      "Over-round cards beyond 16px.",
+      "Use bounce or elastic easings."
+    ]
+  }
+}

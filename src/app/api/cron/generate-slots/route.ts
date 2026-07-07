@@ -15,8 +15,8 @@ export async function GET(req: Request) {
 
   const sb = supabaseAdmin();
   try {
-    const n = await generateSlots(sb, null);
-    return NextResponse.json({ ok: true, generated: n });
+    const result = await generateSlots(sb, null);
+    return NextResponse.json({ ok: true, ...result });
   } catch (e: any) {
     return NextResponse.json({ error: e.message ?? 'failed' }, { status: 500 });
   }

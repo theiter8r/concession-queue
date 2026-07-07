@@ -8,8 +8,8 @@ export async function POST() {
   const me = await requireAdmin();
   const sb = await supabaseServer();
   try {
-    const n = await generateSlots(sb, me.id);
-    return NextResponse.json({ ok: true, generated: n });
+    const result = await generateSlots(sb, me.id);
+    return NextResponse.json({ ok: true, ...result });
   } catch (e: any) {
     return NextResponse.json({ error: e.message ?? 'generation_failed' }, { status: 400 });
   }

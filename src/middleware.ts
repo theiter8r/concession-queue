@@ -3,11 +3,11 @@ import { createServerClient } from '@supabase/ssr';
 
 // Route guard:
 //   /admin/*               → must be authed + role='admin'
-//   /book, /me, /slots     → must be authed + have a profile (else /signup)
-//   /                      → if already authed, push to /me
+//   /book, /me, /profile   → must be authed + have a profile (else /signup)
+//   /                      → if already authed, push to /profile
 // Public: /, /signup, /api/*, _next, static.
 
-const PROTECTED_STUDENT = ['/book', '/me'];
+const PROTECTED_STUDENT = ['/book', '/me', '/profile'];
 const PROTECTED_ADMIN = ['/admin'];
 
 export async function middleware(req: NextRequest) {
@@ -60,7 +60,7 @@ export async function middleware(req: NextRequest) {
 
     // If profile exists and they hit the landing page, send them in.
     if (profile && path === '/') {
-      return NextResponse.redirect(new URL(profile.role === 'admin' ? '/admin' : '/me', req.url));
+      return NextResponse.redirect(new URL(profile.role === 'admin' ? '/admin' : '/profile', req.url));
     }
   }
 

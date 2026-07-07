@@ -38,6 +38,7 @@ export default function AdminDash() {
           <a href="/admin/today"><Button variant="primary">Today</Button></a>
           <a href="/admin/settings"><Button>Settings</Button></a>
           <a href="/admin/export"><Button>Export</Button></a>
+          <a href="/admin/booklet"><Button>Booklets</Button></a>
         </div>
       }
     >

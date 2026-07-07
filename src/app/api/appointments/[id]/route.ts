@@ -9,31 +9,21 @@ export async function DELETE(_: Request, ctx: { params: Promise<{ id: string }> 
   const { id } = await ctx.params;
   const sb = await supabaseServer();
 
-  const { data: appt, error: e1 } = await sb
-    .from('appointments')
-    .select('id, slot_id, request_id, status, concession_requests!inner(user_id), slots!inner(slot_start)')
-    .eq('id', id)
-    .single();
-  if (e1 || !appt) return NextResponse.json({ error: 'not_found' }, { status: 404 });
-  if ((appt as any).concession_requests.user_id !== me.id) {
-    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  const { data: appt, error } = await sb
+    .rpc('cancel_appointment', { p_appointment_id: id })
+    .maybeSingle();
+  if (error) {
+    if (/unauthorized/i.test(error.message ?? '')) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+    }
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
-
-  const { error } = await sb
-    .from('appointments')
-    .update({ status: 'cancelled' })
-    .eq('id', id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-
-  await sb
-    .from('concession_requests')
-    .update({ status: 'draft' })
-    .eq('id', appt.request_id);
+  if (!appt) return NextResponse.json({ error: 'not_found' }, { status: 404 });
 
   await sendStudentCancelEmail({
     to: me.college_email,
     name: me.name,
-    slotStart: (appt as any).slots.slot_start,
+    slotStart: (appt as any).slot_start,
   });
 
   return NextResponse.json({ ok: true });

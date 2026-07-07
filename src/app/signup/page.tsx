@@ -36,7 +36,7 @@ export default function SignupPage() {
 
   useEffect(() => {
     fetch('/api/me').then(r => r.json()).then((p) => {
-      if (p?.id) window.location.href = p.role === 'admin' ? '/admin' : '/me';
+      if (p?.id) window.location.href = p.role === 'admin' ? '/admin' : '/profile';
     });
   }, []);
 
@@ -65,7 +65,7 @@ export default function SignupPage() {
       setErr(j.error ?? 'failed');
       return;
     }
-    window.location.href = '/book';
+    window.location.href = '/profile';
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLFormElement>) {

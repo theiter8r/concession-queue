@@ -38,6 +38,7 @@ export async function POST(req: Request) {
     console.error('[book_appointment] rpc failed:', error);
     const msg = error.message ?? '';
     // §4: surface slot_full so the UI can refresh + reprompt.
+    if (/weekly_limit_reached/.test(msg)) return NextResponse.json({ error: 'weekly_limit_reached' }, { status: 429 });
     if (/slot_full/.test(msg))      return NextResponse.json({ error: 'slot_full' }, { status: 409 });
     if (/slot_not_found/.test(msg)) return NextResponse.json({ error: 'slot_not_found' }, { status: 404 });
     // Partial unique index on appointments (one_active_appt_per_request).

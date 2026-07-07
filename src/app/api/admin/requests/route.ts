@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 
   let q = sb
     .from('concession_requests')
-    .select('*, users:users(name, enrollment_no, college_email, department, academic_year, division)')
+    .select('*, users:users(id, name, enrollment_no, college_email, department, academic_year, division, phone, home_station, address, dob, gender, id_verified)')
     .order('created_at', { ascending: false });
   if (status) q = q.eq('status', status);
   if (station) q = q.eq('station_from', station);

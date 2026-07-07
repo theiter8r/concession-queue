@@ -6,13 +6,14 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 // Idempotent via the unique index on slots.slot_start.
 
 type Working = { weekday: number; open_time: string; close_time: string };
+export type SlotGenerationResult = { generated: number; candidates: number };
 
 function parseHM(t: string): [number, number] {
   const [h, m] = t.split(':').map(Number);
   return [h, m ?? 0];
 }
 
-export async function generateSlots(sb: SupabaseClient, actor: string | null): Promise<number> {
+export async function generateSlots(sb: SupabaseClient, actor: string | null): Promise<SlotGenerationResult> {
   const [{ data: cfg }, { data: hours }, { data: hols }] = await Promise.all([
     sb.from('slot_config').select('*').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
     sb.from('working_hours').select('weekday, open_time, close_time'),
@@ -56,9 +57,12 @@ export async function generateSlots(sb: SupabaseClient, actor: string | null): P
     }
   }
 
-  if (rows.length === 0) return 0;
+  if (rows.length === 0) return { generated: 0, candidates: 0 };
   // onConflict on slot_start (unique) makes this idempotent (§4b).
-  const { error } = await sb.from('slots').upsert(rows, { onConflict: 'slot_start', ignoreDuplicates: true });
+  const { data, error } = await sb
+    .from('slots')
+    .upsert(rows, { onConflict: 'slot_start', ignoreDuplicates: true })
+    .select('id');
   if (error) throw error;
-  return rows.length;
+  return { generated: data?.length ?? 0, candidates: rows.length };
 }

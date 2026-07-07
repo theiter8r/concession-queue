@@ -20,10 +20,30 @@ security definer
 set search_path = public
 as $$
 declare
-  v_capacity int;
-  v_taken    int;
-  v_appt     appointments;
+  v_capacity    int;
+  v_taken       int;
+  v_user_id     uuid;
+  v_weekly_bookings int;
+  v_appt        appointments;
 begin
+  -- Rate limit: max 2 bookings per week per student.
+  select user_id into v_user_id
+  from concession_requests
+  where id = p_request_id;
+
+  select count(*) into v_weekly_bookings
+  from appointments a
+  join slots s on s.id = a.slot_id
+  join concession_requests r on r.id = a.request_id
+  where r.user_id = v_user_id
+    and s.slot_start >= date_trunc('week', current_timestamp)
+    and s.slot_start < date_trunc('week', current_timestamp) + interval '7 days'
+    and a.status in ('booked', 'checked_in');
+
+  if v_weekly_bookings >= 2 then
+    raise exception 'weekly_limit_reached';
+  end if;
+
   select capacity into v_capacity
   from slots where id = p_slot_id
   for update;

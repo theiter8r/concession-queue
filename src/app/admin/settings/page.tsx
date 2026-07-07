@@ -43,26 +43,51 @@ export default function SettingsPage() {
     setDays((arr) => arr.map((d, idx) => idx === i ? mut(d) : d));
   }
 
-  async function save() {
-    setSaving(true); setMsg(null);
+  function schedulePayload() {
+    const validationError = validateSchedule(days, cfg);
+    if (validationError) throw new Error(validationError);
+
     const working_hours = days.flatMap(d =>
       d.enabled ? d.windows.map(w => ({ weekday: d.weekday, open_time: w.open_time, close_time: w.close_time })) : [],
     );
+    return { working_hours, slot_config: cfg };
+  }
+
+  async function saveSchedule() {
     const res = await fetch('/api/admin/schedule', {
       method: 'PUT',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ working_hours, slot_config: cfg }),
+      body: JSON.stringify(schedulePayload()),
     });
-    setSaving(false);
-    setMsg(res.ok ? 'Saved.' : 'Save failed.');
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(j.error ?? 'Save failed.');
+  }
+
+  async function save() {
+    setSaving(true); setMsg(null);
+    try {
+      await saveSchedule();
+      setMsg('Saved.');
+    } catch (e: any) {
+      setMsg(e.message ?? 'Save failed.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function generate() {
     setGenerating(true); setMsg(null);
-    const res = await fetch('/api/admin/slots/generate', { method: 'POST' });
-    const j = await res.json().catch(() => ({}));
-    setGenerating(false);
-    setMsg(res.ok ? `Generated ${j.generated ?? 0} candidate slots.` : (j.error ?? 'Generation failed.'));
+    try {
+      await saveSchedule();
+      const res = await fetch('/api/admin/slots/generate', { method: 'POST' });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(j.error ?? 'Generation failed.');
+      setMsg(generationMessage(j.generated ?? 0, j.candidates ?? 0));
+    } catch (e: any) {
+      setMsg(e.message ?? 'Generation failed.');
+    } finally {
+      setGenerating(false);
+    }
   }
 
   async function addHoliday() {
@@ -225,8 +250,8 @@ export default function SettingsPage() {
         display: 'flex', gap: 8, justifyContent: 'flex-end', alignItems: 'center',
       }}>
         {msg && <span style={{ fontSize: 13, color: 'var(--fg-muted)' }}>{msg}</span>}
-        <Button onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button>
-        <Button variant="primary" onClick={generate} disabled={generating}>
+        <Button onClick={save} disabled={saving || generating}>{saving ? 'Saving…' : 'Save'}</Button>
+        <Button variant="primary" onClick={generate} disabled={saving || generating}>
           {generating ? 'Generating…' : 'Generate slots'}
         </Button>
       </div>
@@ -246,4 +271,39 @@ function Stat({ label, value }: { label: string; value: number }) {
 function toMins(t: string) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + (m || 0);
+}
+
+function validateSchedule(days: Day[], cfg: { slot_minutes: number; default_capacity: number; generate_weeks: number }) {
+  if (cfg.slot_minutes <= 0) return 'Slot length must be greater than 0.';
+  if (cfg.default_capacity <= 0) return 'People per slot must be greater than 0.';
+  if (cfg.generate_weeks <= 0) return 'Horizon must be greater than 0 weeks.';
+
+  for (const d of days) {
+    if (!d.enabled) continue;
+    if (d.windows.length === 0) return `${DAYS[d.weekday]} needs a time window, or turn the day off.`;
+
+    for (const w of d.windows) {
+      const open = timeToMins(w.open_time);
+      const close = timeToMins(w.close_time);
+      if (open == null || close == null) return `${DAYS[d.weekday]} has an invalid time.`;
+      if (close <= open) return `${DAYS[d.weekday]} close time must be after open time.`;
+    }
+  }
+  return null;
+}
+
+function timeToMins(t: string) {
+  const match = t.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+  if (!match) return null;
+  return Number(match[1]) * 60 + Number(match[2]);
+}
+
+function generationMessage(generated: number, candidates: number) {
+  if (generated > 0) {
+    return `Generated ${generated.toLocaleString()} new ${generated === 1 ? 'slot' : 'slots'}.`;
+  }
+  if (candidates > 0) {
+    return `No new slots. ${candidates.toLocaleString()} ${candidates === 1 ? 'slot' : 'slots'} already exist in this horizon.`;
+  }
+  return 'Generated 0 slots. Check working days, time windows, slot length, and holidays.';
 }

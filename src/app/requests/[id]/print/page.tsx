@@ -68,7 +68,7 @@ export default async function PrintPage({ params }: { params: Promise<{ id: stri
       <PrintTrigger />
       <div className="sheet">
         <div className="topbar no-print">
-          <a href={me.role === 'admin' ? '/admin' : '/me'}>← Back</a>
+          <a href={me.role === 'admin' ? '/admin' : '/profile'}>← Back</a>
           <button className="btn-print" id="btn-print" type="button">Print / Save as PDF</button>
         </div>
 
