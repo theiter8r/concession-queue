@@ -36,6 +36,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* Google AdSense. Plain tag, not next/script: AdSense verification rejects data-nscript. */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6314321343252532"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         {/* MobileNav renders the in-flow top bar, so it must precede the page. */}
         <MobileNav />
