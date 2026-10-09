@@ -13,7 +13,7 @@ type Req = {
   due_date: string | null;
   created_at: string;
   season_ticket_no: string | null;
-  appointment: { id: string; status: string; slot_start: string | null } | null;
+  appointment: { id: string; status: string; slot_start: string | null; otp_code: string | null } | null;
 };
 
 const statusTone: Record<Req['status'], 'neutral' | 'ok' | 'warn' | 'danger'> = {
@@ -131,6 +131,23 @@ export default function MePage() {
                   border: '1px solid color-mix(in oklab, var(--accent) 24%, transparent)',
                 }}>
                   Appointment · {formatSlot(r.appointment.slot_start)}
+                </div>
+              )}
+              {r.appointment?.otp_code && r.status === 'booked' && (
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ fontSize: 12, color: 'var(--fg-muted)', marginBottom: 4 }}>
+                    Show this code at the counter
+                  </div>
+                  <div style={{
+                    display: 'inline-block',
+                    padding: '6px 12px', borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border)', background: 'var(--bg)',
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                    fontSize: 22, fontWeight: 600, letterSpacing: 6,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}>
+                    {r.appointment.otp_code}
+                  </div>
                 </div>
               )}
             </div>

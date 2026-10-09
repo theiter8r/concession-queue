@@ -21,6 +21,7 @@ export default function BookPage() {
   const [pendingSlot, setPendingSlot] = useState<Slot | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [otpCode, setOtpCode] = useState<string | null>(null);
   const [stPrompt, setStPrompt] = useState<{ request_id: string; route: string } | null>(null);
   const [stNo, setStNo] = useState('');
   const [stBusy, setStBusy] = useState(false);
@@ -130,18 +131,35 @@ export default function BookPage() {
       setPicking(null);
       return;
     }
+    const appt = await res.json().catch(() => ({}));
+    setOtpCode(appt?.otp_code ?? null);
     setDone(true);
   }
 
   if (done) {
     return (
-      <Page title="Booked" subtitle="Check your email for the check-in OTP.">
+      <Page title="Booked" subtitle="Your check-in code is below, on My requests, and in your email.">
         <Card style={{ padding: 24 }}>
+          {otpCode && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: 'var(--fg-muted)', marginBottom: 4 }}>Check-in code</div>
+              <div style={{
+                display: 'inline-block',
+                padding: '6px 12px', borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border)', background: 'var(--bg)',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                fontSize: 22, fontWeight: 600, letterSpacing: 6,
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {otpCode}
+              </div>
+            </div>
+          )}
           <p style={{ margin: 0, color: 'var(--fg-muted)' }}>
-            Bring your college ID. Show the OTP at the counter.
+            Bring your college ID. Show the code at the counter.
           </p>
           <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
-            <a href="/profile"><Button variant="primary">View my profile</Button></a>
+            <a href="/me"><Button variant="primary">My requests</Button></a>
             <a href="/slots"><Button>Live slots</Button></a>
           </div>
         </Card>
