@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import { Button, Card, Input, Label, Select } from '@/components/ui';
 import { DatePicker } from '@/components/date-picker';
 import { StationSelect } from '@/components/station-select';
+import {
+  AddressPicker, addressComplete, addressFrom, addressPayload, composeAddress, type AddressValue,
+} from '@/components/address-picker';
 
 // /signup — multi-step wizard. One thing at a time so mobile users aren't
 // scrolling through a wall of inputs. Each step gates the next; Enter or
@@ -15,7 +18,7 @@ type Form = {
   phone: string;
   enrollment_no: string;
   home_station: string;
-  address: string;
+  addr: AddressValue;
   department: string;
   academic_year: 'FE' | 'SE' | 'TE' | 'BE' | '';
   division: string;
@@ -30,7 +33,8 @@ export default function SignupPage() {
   const [err, setErr] = useState<string | null>(null);
   const [me, setMe] = useState<Form>({
     name: '', dob: '', gender: 'female',
-    phone: '', enrollment_no: '', home_station: '', address: '',
+    phone: '', enrollment_no: '', home_station: '',
+    addr: addressFrom({}),
     department: '', academic_year: '', division: '',
   });
 
@@ -57,7 +61,7 @@ export default function SignupPage() {
     const res = await fetch('/api/me', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(me),
+      body: JSON.stringify(signupPayload(me)),
     });
     setBusy(false);
     if (!res.ok) {
@@ -155,6 +159,10 @@ export default function SignupPage() {
   );
 }
 
+function signupPayload({ addr, ...rest }: Form) {
+  return { ...rest, ...addressPayload(addr) };
+}
+
 // Per-step validity — controls Continue/Finish enablement.
 function canAdvance(step: number, me: Form): boolean {
   switch (step) {
@@ -163,7 +171,7 @@ function canAdvance(step: number, me: Form): boolean {
     case 2: return me.enrollment_no.trim().length > 0;
     case 3: return me.department.trim().length > 0 && !!me.academic_year && me.division.trim().length > 0;
     case 4: return me.home_station.trim().length > 0;
-    case 5: return me.address.trim().length > 0;
+    case 5: return addressComplete(me.addr);
     default: return false;
   }
 }
@@ -311,16 +319,10 @@ function StepStation({ me, setMe }: { me: Form; setMe: (f: (m: Form) => Form) =>
 function StepReview({ me, setMe }: { me: Form; setMe: (f: (m: Form) => Form) => void }) {
   return (
     <>
-      <StepHeader title="Almost done" hint="Add your residential address — printed on the form. Review the rest below." />
+      <StepHeader title="Almost done" hint="Pin your home on the map — the address is printed on the form. Review the rest below." />
       <div>
         <Label>Residential address</Label>
-        <Input
-          required
-          autoFocus
-          value={me.address}
-          onChange={(e) => setMe(m => ({ ...m, address: e.target.value }))}
-          placeholder="Street, area, PIN"
-        />
+        <AddressPicker value={me.addr} onChange={(addr) => setMe(m => ({ ...m, addr }))} />
       </div>
 
       <div style={{
@@ -340,6 +342,7 @@ function StepReview({ me, setMe }: { me: Form; setMe: (f: (m: Form) => Form) => 
         <Row k="Department" v={me.department} />
         <Row k="Year · Division" v={`${me.academic_year} · ${me.division}`} />
         <Row k="Home station" v={me.home_station} />
+        <Row k="Address" v={composeAddress(me.addr)} />
       </div>
     </>
   );

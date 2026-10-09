@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Page, Card, Button, Input, Label, Select } from '@/components/ui';
 import { StationSelect } from '@/components/station-select';
 import { Onboarding } from '@/components/onboarding';
+import { AddressPicker, addressFrom, addressPayload, isPinned, type AddressValue } from '@/components/address-picker';
 
 type Profile = {
   id: string;
@@ -14,6 +15,13 @@ type Profile = {
   college_email: string;
   home_station: string;
   address: string | null;
+  address_lat: number | null;
+  address_lng: number | null;
+  address_locality: string | null;
+  address_flat: string | null;
+  address_building: string | null;
+  address_landmark: string | null;
+  address_map_line: string | null;
   department: string | null;
   academic_year: string | null;
   division: string | null;
@@ -40,6 +48,7 @@ export default function ProfilePage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [me, setMe] = useState<Profile | null>(null);
+  const [addr, setAddr] = useState<AddressValue>(addressFrom({}));
   const [reqs, setReqs] = useState<Req[]>([]);
 
   useEffect(() => {
@@ -49,6 +58,7 @@ export default function ProfilePage() {
     ]).then(([p, r]) => {
       if (!p?.id) { window.location.href = '/signup'; return; }
       setMe(p);
+      setAddr(addressFrom(p));
       if (Array.isArray(r)) setReqs(r);
       setLoaded(true);
     });
@@ -68,7 +78,7 @@ export default function ProfilePage() {
         phone: me.phone ?? '',
         enrollment_no: me.enrollment_no,
         home_station: me.home_station,
-        address: me.address ?? '',
+        ...addressPayload(addr),
         department: me.department ?? '',
         academic_year: me.academic_year ?? '',
         division: me.division ?? '',
@@ -77,9 +87,12 @@ export default function ProfilePage() {
     setBusy(false);
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
-      setErr(j.error ?? 'failed');
+      setErr(j.error === 'address_flat_required' ? 'Add your flat / house number.' : j.error ?? 'failed');
       return;
     }
+    const saved = await res.json();
+    setMe(saved);
+    setAddr(addressFrom(saved));
     setEditing(false);
   }
 
@@ -125,11 +138,7 @@ export default function ProfilePage() {
             </div>
             <div>
               <Label>Residential address</Label>
-              <Input
-                placeholder="Street, area, PIN"
-                value={me.address ?? ''}
-                onChange={(e) => setMe({ ...me, address: e.target.value })}
-              />
+              <AddressPicker value={addr} onChange={setAddr} />
             </div>
             <div>
               <Label>Department</Label>
@@ -174,7 +183,7 @@ export default function ProfilePage() {
             )}
 
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
-              <Button type="button" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
+              <Button type="button" variant="ghost" onClick={() => { setAddr(addressFrom(me)); setEditing(false); }}>Cancel</Button>
               <Button type="submit" variant="primary" disabled={busy}>
                 {busy ? 'Saving…' : 'Save changes'}
               </Button>
@@ -235,6 +244,12 @@ export default function ProfilePage() {
                 <ProfileField label="Home station" value={me.home_station} />
                 <ProfileField label="Residential address" value={me.address} />
               </div>
+              {!isPinned(addressFrom(me)) && (
+                <button type="button" className="profile-nudge" onClick={() => setEditing(true)}>
+                  <span style={{ fontWeight: 600 }}>Pin your home on the map</span>
+                  <span style={{ color: 'var(--fg-muted)' }}>Takes 20 seconds — the office needs it to verify your address.</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -366,6 +381,19 @@ export default function ProfilePage() {
           }
           @media (min-width: 400px) {
             .profile-grid { grid-template-columns: 1fr 1fr; }
+          }
+          .profile-nudge {
+            display: grid; gap: 2px;
+            width: 100%; margin-top: 12px; padding: 10px 12px;
+            text-align: left; font-size: 13px;
+            border: 1px dashed var(--border-strong);
+            border-radius: var(--radius-sm);
+            background: var(--bg); color: var(--fg);
+            cursor: pointer;
+            transition: border-color 160ms var(--ease-out);
+          }
+          @media (hover: hover) and (pointer: fine) {
+            .profile-nudge:hover { border-color: var(--fg-muted); }
           }
           .profile-actions {
             padding: 0 20px 20px;
