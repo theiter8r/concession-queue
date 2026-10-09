@@ -40,11 +40,13 @@ export async function POST(req: Request) {
 
 // GET /api/requests — my requests + statuses + due dates + active appointment (§11).
 export async function GET() {
-  await requireUser();
+  const me = await requireUser();
   const sb = await supabaseServer();
+  // Filter explicitly: RLS lets admins read every request, but this is "my" list.
   const { data, error } = await sb
     .from('concession_requests')
-    .select('*, appointments(id, status, slots(slot_start))')
+    .select('*, appointments(id, status, otp_code, slots(slot_start))')
+    .eq('user_id', me.id)
     .order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
@@ -55,7 +57,13 @@ export async function GET() {
     return {
       ...r,
       appointment: active
-        ? { id: active.id, status: active.status, slot_start: active.slots?.slot_start ?? null }
+        ? {
+            id: active.id,
+            status: active.status,
+            slot_start: active.slots?.slot_start ?? null,
+            // Only useful until the counter checks it.
+            otp_code: active.status === 'booked' ? active.otp_code ?? null : null,
+          }
         : null,
       appointments: undefined,
     };

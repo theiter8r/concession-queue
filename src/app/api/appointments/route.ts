@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { requireUser } from '@/lib/auth';
 import { generateOtp } from '@/lib/otp';
 import { sendBookingEmail } from '@/lib/email';
@@ -48,6 +49,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: msg || 'booking_failed' }, { status: 400 });
   }
 
+  // Store the plain code so /me can show it. Students have no update policy
+  // for this column, so write it with the service role.
+  const { error: otpErr } = await supabaseAdmin()
+    .from('appointments')
+    .update({ otp_code: otp.code })
+    .eq('id', data.id);
+  if (otpErr) console.error('[appointments] storing otp_code failed:', otpErr.message);
+
   const { data: slot } = await sb
     .from('slots')
     .select('slot_start')
@@ -62,5 +71,6 @@ export async function POST(req: Request) {
     appointmentId: data.id,
   });
 
-  return NextResponse.json(data);
+  // The student owns this code; hand it back so the confirmation can show it.
+  return NextResponse.json({ ...data, otp_code: otp.code });
 }
