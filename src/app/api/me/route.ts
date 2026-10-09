@@ -57,6 +57,12 @@ export async function POST(req: Request) {
     return NextResponse.json(data);
   }
   const { data, error } = await sb.from('users').insert(payload).select().single();
+  if (error?.code === '23505' && /enrollment_no/.test(error.message)) {
+    return NextResponse.json(
+      { error: 'This enrollment number is already registered. Check it, or contact the concession office.' },
+      { status: 409 },
+    );
+  }
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json(data);
 }
