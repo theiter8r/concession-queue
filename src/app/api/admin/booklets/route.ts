@@ -7,13 +7,17 @@ export async function GET() {
   await requireAdmin();
   const sb = await supabaseServer();
 
-  const { data, error } = await sb
-    .from('booklets')
-    .select('*, issued:concession_forms(count)')
-    .order('booklet_no', { ascending: true });
+  // concession_forms links to a booklet by booklet_no (text, no FK), so
+  // PostgREST can't embed a count — tally it here instead.
+  const [{ data, error }, { data: forms, error: fErr }] = await Promise.all([
+    sb.from('booklets').select('*').order('booklet_no', { ascending: true }),
+    sb.from('concession_forms').select('booklet_no'),
+  ]);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json(data ?? []);
+  if (error || fErr) return NextResponse.json({ error: (error ?? fErr)!.message }, { status: 400 });
+  const counts = new Map<string, number>();
+  for (const f of forms ?? []) counts.set(f.booklet_no, (counts.get(f.booklet_no) ?? 0) + 1);
+  return NextResponse.json((data ?? []).map(b => ({ ...b, issued: [{ count: counts.get(b.booklet_no) ?? 0 }] })));
 }
 
 // POST /api/admin/booklets — create a new booklet.
