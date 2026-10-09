@@ -26,6 +26,7 @@ export function SiteFooter() {
 
   return (
     <footer
+      className="site-footer"
       style={{
         position: 'relative',
         zIndex: 1,

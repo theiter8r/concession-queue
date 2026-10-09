@@ -37,8 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <div className="page-enter">{children}</div>
+        {/* MobileNav renders the in-flow top bar, so it must precede the page. */}
         <MobileNav />
+        <div className="page-enter">{children}</div>
         <SiteFooter />
       </body>
     </html>

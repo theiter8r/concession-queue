@@ -328,3 +328,10 @@ input:focus, select:focus, textarea:focus {
     padding-bottom: calc(64px + 60px);
   }
 }
+
+/* Keep the footer credit clear of the floating desktop sidebar (signed-in pages only). */
+@media (min-width: 640px) {
+  body:has(.mobile-nav) .site-footer {
+    padding-left: max(16px, calc(140px - (100vw - 1100px) / 2)) !important;
+  }
+}

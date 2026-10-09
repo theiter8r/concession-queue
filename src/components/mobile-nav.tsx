@@ -10,6 +10,14 @@ const NAV_ITEMS = [
   { href: '/me', label: 'Requests' },
 ];
 
+const ADMIN_NAV_ITEMS = [
+  { href: '/admin', label: 'Overview' },
+  { href: '/admin/today', label: 'Today' },
+  { href: '/admin/booklet', label: 'Booklets' },
+  { href: '/admin/settings', label: 'Settings' },
+  { href: '/admin/export', label: 'Export' },
+];
+
 const HIDDEN_PATHS = ['/', '/login', '/signup'];
 
 export function MobileNav() {
@@ -37,7 +45,8 @@ export function MobileNav() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (!authed || HIDDEN_PATHS.includes(pathname) || pathname.startsWith('/admin')) return null;
+  if (!authed || HIDDEN_PATHS.includes(pathname)) return null;
+  const items = pathname.startsWith('/admin') ? ADMIN_NAV_ITEMS : NAV_ITEMS;
 
   async function signOut() {
     const sb = supabaseBrowser();
@@ -64,7 +73,7 @@ export function MobileNav() {
       </header>
 
       <nav className="mobile-nav" aria-label="Main navigation">
-        {NAV_ITEMS.map(item => {
+        {items.map(item => {
           const active = pathname === item.href;
           return (
             <a
